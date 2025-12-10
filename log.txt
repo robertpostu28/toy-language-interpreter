@@ -1,0 +1,110 @@
+ExeStack:
+[(bool a; (a = false; (int v; (if (a) then (v = 2) else (v = 3); print(v)))))]
+SymTable:
+{}
+Out:
+[]
+FileTable:
+{}
+
+-----------------------------------------
+ExeStack:
+[bool a|(a = false; (int v; (if (a) then (v = 2) else (v = 3); print(v))))]
+SymTable:
+{}
+Out:
+[]
+FileTable:
+{}
+
+-----------------------------------------
+ExeStack:
+[(a = false; (int v; (if (a) then (v = 2) else (v = 3); print(v))))]
+SymTable:
+{a=false}
+Out:
+[]
+FileTable:
+{}
+
+-----------------------------------------
+ExeStack:
+[a = false|(int v; (if (a) then (v = 2) else (v = 3); print(v)))]
+SymTable:
+{a=false}
+Out:
+[]
+FileTable:
+{}
+
+-----------------------------------------
+ExeStack:
+[(int v; (if (a) then (v = 2) else (v = 3); print(v)))]
+SymTable:
+{a=false}
+Out:
+[]
+FileTable:
+{}
+
+-----------------------------------------
+ExeStack:
+[int v|(if (a) then (v = 2) else (v = 3); print(v))]
+SymTable:
+{a=false}
+Out:
+[]
+FileTable:
+{}
+
+-----------------------------------------
+ExeStack:
+[(if (a) then (v = 2) else (v = 3); print(v))]
+SymTable:
+{a=false, v=0}
+Out:
+[]
+FileTable:
+{}
+
+-----------------------------------------
+ExeStack:
+[if (a) then (v = 2) else (v = 3)|print(v)]
+SymTable:
+{a=false, v=0}
+Out:
+[]
+FileTable:
+{}
+
+-----------------------------------------
+ExeStack:
+[v = 3|print(v)]
+SymTable:
+{a=false, v=0}
+Out:
+[]
+FileTable:
+{}
+
+-----------------------------------------
+ExeStack:
+[print(v)]
+SymTable:
+{a=false, v=3}
+Out:
+[]
+FileTable:
+{}
+
+-----------------------------------------
+ExeStack:
+[]
+SymTable:
+{a=false, v=3}
+Out:
+[3]
+FileTable:
+{}
+
+-----------------------------------------

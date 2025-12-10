@@ -1,0 +1,40 @@
+ExeStack:
+[(bool b; b = 1)]
+SymTable:
+{}
+Out:
+[]
+FileTable:
+{}
+
+-----------------------------------------
+ExeStack:
+[bool b|b = 1]
+SymTable:
+{}
+Out:
+[]
+FileTable:
+{}
+
+-----------------------------------------
+ExeStack:
+[b = 1]
+SymTable:
+{b=false}
+Out:
+[]
+FileTable:
+{}
+
+-----------------------------------------
+ExeStack:
+[]
+SymTable:
+{b=false}
+Out:
+[]
+FileTable:
+{}
+
+-----------------------------------------
