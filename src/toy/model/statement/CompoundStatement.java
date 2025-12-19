@@ -17,7 +17,7 @@ public class CompoundStatement implements Statement {
         // push second, then first - first will be executed next
         state.getExeStack().push(second);
         state.getExeStack().push(first);
-        return state;
+        return null;
     }
 
     @Override

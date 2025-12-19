@@ -19,25 +19,32 @@ public class RunExample extends Command {
     @Override
     public void execute() {
         System.out.println("\nRunning example: " + getDescription());
+
+        // keep a reference to the initial program state (so we can read Out at the end)
+        PrgState initial = null;
+        var listBefore = repo.getProgramsList();
+        if (!listBefore.isEmpty()) {
+            initial = listBefore.get(0);
+        }
+
         try {
-            // run the whole program (this also logs after each step)
             controller.allStep();
 
-            // get final program state from repository and print OUT
-            PrgState prg = repo.getProgram();
-            if (prg != null) {
-                System.out.println("Program output: " + prg.getOut());
+            if (initial != null) {
+                System.out.println("Program output: " + initial.getOut());
             } else {
-                System.out.println("Program finished, but repository has no program state.");
+                System.out.println("No program to run.");
             }
         } catch (InterpreterException e) {
-            // on error, log last state if possible
             try {
-                repo.logPrgStateExec();
+                for (PrgState p : repo.getProgramsList()) {
+                    repo.logPrgStateExec(p);
+                }
             } catch (InterpreterException ignored) { }
 
             System.out.println("Interpreter error: " + e.getMessage());
         }
+
         System.out.println();
     }
 }

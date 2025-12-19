@@ -40,7 +40,7 @@ public class OpenRFileStatement implements Statement {
             throw new InterpreterException("openRFile: could not open file " + fileNameVal.getValue() + ": " + e.getMessage());
         }
 
-        return state;
+        return null;
     }
 
     @Override

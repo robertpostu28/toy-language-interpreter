@@ -1,5 +1,6 @@
 package toy.model.statement;
 
+import toy.exceptions.InterpreterException;
 import toy.model.adt.Sequence;
 import toy.model.adt.Dictionary;
 import toy.model.adt.Stack;
@@ -18,6 +19,9 @@ public class PrgState {
     private final Dictionary<StringValue, BufferedReader> fileTable;
     private final Heap heap;
 
+    private static int lastId = 1;
+    private final int id;
+
     public PrgState(Stack<Statement> exeStack,
                     Dictionary<String, Value> symTable,
                     Sequence<Value> out,
@@ -30,6 +34,8 @@ public class PrgState {
         this.fileTable = fileTable;
         this.heap = heap;
         this.originalProgram = originalProgram;
+
+        this.id = getNewId(); // assign a unique ID to this program state
 
         this.exeStack.push(originalProgram);
     }
@@ -49,10 +55,24 @@ public class PrgState {
     }
     public Dictionary<StringValue, BufferedReader> getFileTable() {return fileTable;}
     public Heap getHeap() { return heap; }
+    public int getId() { return id;}
+
+    public PrgState oneStep() throws InterpreterException {
+        if (exeStack.isEmpty()) {
+            throw new InterpreterException("PrgState stack is empty");
+        }
+
+        Statement currentStatement = exeStack.pop();
+
+        // execute() can return a new PrgState in case of forking, null otherwise
+        return currentStatement.execute(this);
+    }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
+
+        sb.append("Program State ID: ").append(id).append("\n");
 
         sb.append("ExeStack:\n");
         sb.append(exeStack).append("\n");
@@ -70,5 +90,13 @@ public class PrgState {
         sb.append(fileTable).append("\n");
 
         return sb.toString();
+    }
+
+    public boolean isNotCompleted() {
+        return !exeStack.isEmpty();
+    }
+
+    private static synchronized int getNewId() {
+        return lastId++;
     }
 }

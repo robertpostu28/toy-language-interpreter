@@ -47,7 +47,7 @@ public class NewStatement implements Statement {
 
         symTable.update(varName, new RefValue(newAddress, locationType));
 
-        return prgState;
+        return null;
     }
 
     @Override

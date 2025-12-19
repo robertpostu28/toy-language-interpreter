@@ -30,7 +30,7 @@ public class VariableDeclarationStatement implements Statement {
         Value defaultValue = varType.defaultValue();
         symTable.update(varName, defaultValue);
 
-        return state;
+        return null;
     }
 
     @Override

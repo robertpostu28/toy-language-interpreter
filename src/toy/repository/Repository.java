@@ -3,9 +3,11 @@ package toy.repository;
 import toy.exceptions.InterpreterException;
 import toy.model.statement.PrgState;
 
-public interface Repository {
-    PrgState getProgram();
-    void setProgram(PrgState state);
+import java.util.List;
 
-    void logPrgStateExec() throws InterpreterException;
+public interface Repository {
+    List<PrgState> getProgramsList();
+    void setProgramsList(List<PrgState> prgList);
+
+    void logPrgStateExec(PrgState state) throws InterpreterException;
 }

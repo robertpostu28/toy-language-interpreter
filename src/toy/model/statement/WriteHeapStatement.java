@@ -70,7 +70,7 @@ public class WriteHeapStatement implements Statement {
 
         heap.update(address, evaluated);
 
-        return state;
+        return null;
     }
 
     @Override

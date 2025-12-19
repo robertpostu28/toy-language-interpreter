@@ -29,7 +29,7 @@ public class AssignmentStatement implements Statement {
             throw new InterpreterException("Assignment: type mismatch for variable " + id + " (expected " + typeId + ", got " + val.getType() + ").");
         }
         sym.update(id, val);
-        return state;
+        return null;
     }
 
     @Override

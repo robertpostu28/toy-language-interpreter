@@ -40,7 +40,7 @@ public class CloseRFileStatement implements Statement {
         }
 
         fileTable.remove(fileNameVal);
-        return state;
+        return null;
     }
 
     @Override

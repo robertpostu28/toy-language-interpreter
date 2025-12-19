@@ -19,7 +19,7 @@ public class PrintStatement implements Statement {
         Dictionary<String, Value> symTable = state.getSymTable();
         Sequence<Value> out = state.getOut();
         out.addStatement(exp.eval(symTable, state.getHeap()));
-        return state;
+        return null;
     }
 
     @Override

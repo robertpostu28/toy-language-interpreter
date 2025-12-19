@@ -63,7 +63,7 @@ public class ReadFileStatement implements Statement {
             throw new InterpreterException("readFile: error reading from file " + fileNameVal.getValue() + ": " + e.getMessage());
         }
 
-        return state;
+        return null;
     }
 
     @Override

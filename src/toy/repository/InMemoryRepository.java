@@ -9,41 +9,50 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 public class InMemoryRepository implements Repository {
-    private PrgState program;
+    private List<PrgState> programsList;
     private final Path logPath;
 
     public InMemoryRepository(String logFilePath) {
-        this.logPath = Path.of(logFilePath);
+        Path logsDir = Path.of("logs");
+
         try {
-            Files.deleteIfExists(logPath);
-            Files.createFile(logPath);
+            Files.createDirectories(logsDir);
+        } catch (IOException e) {
+            throw new RuntimeException("Could not create logs directory: " + e.getMessage());
+        }
+
+        this.logPath = logsDir.resolve(logFilePath);
+        this.programsList = new ArrayList<>();
+
+        try {
+            Files.deleteIfExists(this.logPath);
+            Files.createFile(this.logPath);
         } catch (IOException e) {
             throw new RuntimeException("Could not initialize log file: " + e.getMessage());
         }
     }
 
     @Override
-    public PrgState getProgram() {
-        return program;
+    public List<PrgState> getProgramsList() {
+        return programsList;
     }
 
     @Override
-    public void setProgram(PrgState program) {
-        this.program = program;
+    public void setProgramsList(List<PrgState> programs) {
+        this.programsList = programs;
     }
 
     @Override
-    public void logPrgStateExec() throws InterpreterException {
-        if (program == null) {
-            throw new InterpreterException("No program state set in repository.");
-        }
-        try (PrintWriter logFile = new PrintWriter(new BufferedWriter(new FileWriter(logPath.toFile(), true)))) {
+    public void logPrgStateExec(PrgState program) throws InterpreterException {
+        try (var logFile = new PrintWriter(new FileWriter(logPath.toFile(), true))) {
             logFile.println(program.toString());
-            logFile.println("-----------------------------------------");
-        } catch (IOException e) {
-            throw new InterpreterException("Error while logging program state: " + e.getMessage());
+            logFile.println("--------------------------------------------------");
+        } catch (IOException exception) {
+            throw new InterpreterException("Could not log program state: " + exception.getMessage());
         }
     }
 }

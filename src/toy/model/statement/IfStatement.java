@@ -28,7 +28,7 @@ public class IfStatement implements Statement {
 
         boolean b = ((BoolValue) condValue).getValue();
         state.getExeStack().push(b ? thenStatement : elseStatement);
-        return state;
+        return null;
     }
 
     @Override

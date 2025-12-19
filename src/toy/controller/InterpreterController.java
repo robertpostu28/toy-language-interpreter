@@ -9,47 +9,106 @@ import toy.model.value.Value;
 import toy.repository.Repository;
 
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 
 public class InterpreterController implements Controller {
     private final Repository repo;
+    private ExecutorService executor;
 
     public InterpreterController(Repository repo) {
+
         this.repo = repo;
+        this.executor = null;
     }
 
     @Override
     public PrgState oneStep(PrgState state) throws InterpreterException {
-        Stack<Statement> stack =state.getExeStack();
-        if (stack.isEmpty())
-            throw new InterpreterException("Cannot execute oneStep: Execution stack is empty!");
-        Statement currentStatement = stack.pop();
-        return currentStatement.execute(state);
+        return state.oneStep();
+    }
+
+    private List<PrgState> removeCompletedPrg(List<PrgState> inPrgList) {
+        return inPrgList.stream()
+                .filter(PrgState::isNotCompleted)
+                .collect(Collectors.toCollection(ArrayList::new));
+    }
+
+    private void oneStepForAllPrg(List<PrgState> prgList) throws InterpreterException {
+        // execute one step for each program (concurrently)
+        List<Callable<PrgState>> callList = prgList.stream()
+                .map((PrgState p) -> (Callable<PrgState>) p::oneStep)
+                .toList();
+
+        List<Future<PrgState>> futures;
+        try {
+            futures = executor.invokeAll(callList);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new InterpreterException("Execution interrupted: " + e.getMessage());
+        }
+
+        List<PrgState> newPrgList = futures.stream()
+                .map(future -> {
+                    try {
+                        return future.get();
+                    } catch (Exception e) {
+                        throw new RuntimeException("Error while executing one step: " + e);
+                    }
+                })
+                .filter(Objects::nonNull)
+                .toList();
+
+        // add the new programs to the list
+        prgList.addAll(newPrgList);
+
+        // log after
+        prgList.forEach(prgState -> {
+            try {
+                repo.logPrgStateExec(prgState);
+            } catch (InterpreterException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        // save the current programs in the repository
+        repo.setProgramsList(prgList);
     }
 
     @Override
     public void allStep() throws InterpreterException {
-        PrgState state = repo.getProgram();
-        if (state == null) {
-            throw new InterpreterException("No program found in the repository.");
+        executor = Executors.newFixedThreadPool(2);
+
+        List<PrgState> prgList = removeCompletedPrg(repo.getProgramsList());
+
+        for (PrgState prg : prgList) {
+            repo.logPrgStateExec(prg);
         }
 
-        // log the initial state before any step
-        repo.logPrgStateExec();
+        while (!prgList.isEmpty()) {
+            // GC: root addresses from all symbol tables
 
-        while (!state.getExeStack().isEmpty()) {
-            oneStep(state); // execute one step
+            List<Value> allSymTableValues = prgList.stream().
+                    map(prg -> prg.getSymTable().asMap().values())
+                    .flatMap(v -> v.stream())
+                    .toList();
 
-            Map<Integer, Value> newHeap =
-                    safeGarbageCollector(
-                            state.getSymTable().asMap().values(),
-                            state.getHeap().getContent()
-                    );
+            // we presume that all programs share the same heap: we take the heap from the first program
+            Map<Integer, Value> heapContent = prgList.get(0).getHeap().getContent();
+            Map<Integer, Value> newHeap = safeGarbageCollector(allSymTableValues, heapContent);
 
-            state.getHeap().setContent(newHeap);
+            // update the heap of each program (same object, but safe)
+            prgList.forEach(prg -> prg.getHeap().setContent(newHeap));
 
-            repo.logPrgStateExec(); // log after each step
+            oneStepForAllPrg(prgList);
+
+            prgList = removeCompletedPrg(repo.getProgramsList());
         }
+
+        executor.shutdownNow();
+        repo.setProgramsList(prgList);
     }
 
     private List<Integer> getAddrFromSymTable(Collection<Value> symTableValues) {

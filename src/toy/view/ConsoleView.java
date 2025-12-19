@@ -30,6 +30,8 @@ import toy.model.statement.WriteHeapStatement;
 
 
 import java.io.BufferedReader;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ConsoleView implements View {
 
@@ -417,6 +419,42 @@ public class ConsoleView implements View {
                         )
                 );
 
+        // EXFork: int v; v=10; Ref int a; new(a,22);
+        // fork( wH(a,30); v=32; print(v); print(rH(a)) );
+        // print(v); print(rH(a));
+        Statement exFork =
+                new CompoundStatement(
+                        new VariableDeclarationStatement("v", new IntType()),
+                        new CompoundStatement(
+                                new VariableDeclarationStatement("a", new RefType(new IntType())),
+                                new CompoundStatement(
+                                        new AssignmentStatement("v", new ValueExp(new IntValue(10))),
+                                        new CompoundStatement(
+                                                new NewStatement("a", new ValueExp(new IntValue(22))),
+                                                new CompoundStatement(
+                                                        new ForkStatement(
+                                                                new CompoundStatement(
+                                                                        new WriteHeapStatement("a", new ValueExp(new IntValue(30))),
+                                                                        new CompoundStatement(
+                                                                                new AssignmentStatement("v", new ValueExp(new IntValue(32))),
+                                                                                new CompoundStatement(
+                                                                                        new PrintStatement(new VarExp("v")),
+                                                                                        new PrintStatement(new ReadHeapExp(new VarExp("a")))
+                                                                                )
+                                                                        )
+                                                                )
+                                                        ),
+                                                        new CompoundStatement(
+                                                                new PrintStatement(new VarExp("v")),
+                                                                new PrintStatement(new ReadHeapExp(new VarExp("a")))
+                                                        )
+                                                )
+                                        )
+                                )
+                        )
+                );
+
+
 
         RunExample cmd1 = buildCommandForProgram(
                 "1",
@@ -530,6 +568,14 @@ public class ConsoleView implements View {
                 "log16_gc.txt"
         );
 
+        RunExample cmd17 = buildCommandForProgram(
+                "17",
+                "int v; v=10; Ref int a; new(a,22); fork( wH(a,30); v=32; print(v); print(rH(a)) ); print(v); print(rH(a));",
+                exFork,
+                "log17_fork.txt"
+        );
+
+
         // ======================
         // 3. BUILD & RUN MENU
         // ======================
@@ -552,6 +598,7 @@ public class ConsoleView implements View {
         menu.addCommand(cmd14);
         menu.addCommand(cmd15);
         menu.addCommand(cmd16);
+        menu.addCommand(cmd17);
 
         menu.show();  // prints menu + executes selected command in a loop
     }
@@ -573,7 +620,7 @@ public class ConsoleView implements View {
         PrgState state = new PrgState(stack, symTable, out, fileTable, heap, program);
 
         Repository repo = new InMemoryRepository(logFile);
-        repo.setProgram(state);
+        repo.setProgramsList(new ArrayList<>(List.of(state)));
 
         Controller controller = new InterpreterController(repo);
 
