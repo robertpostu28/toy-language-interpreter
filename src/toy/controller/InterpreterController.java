@@ -1,6 +1,7 @@
 package toy.controller;
 
 import toy.exceptions.InterpreterException;
+import toy.model.adt.RuntimeDictionary;
 import toy.model.adt.Stack;
 import toy.model.statement.PrgState;
 import toy.model.statement.Statement;
@@ -109,6 +110,18 @@ public class InterpreterController implements Controller {
 
         executor.shutdownNow();
         repo.setProgramsList(prgList);
+    }
+
+    @Override
+    public void typeCheckAll() throws InterpreterException {
+        List<PrgState> prgList = repo.getProgramsList();
+        if (prgList == null || prgList.isEmpty()) {
+            throw new InterpreterException("No program states available for type checking.");
+        }
+
+        for (PrgState prg : prgList) {
+            prg.getOriginalProgram().typeCheck(new RuntimeDictionary<>());
+        }
     }
 
     private List<Integer> getAddrFromSymTable(Collection<Value> symTableValues) {

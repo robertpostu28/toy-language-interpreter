@@ -22,6 +22,22 @@ public class RelationalExp implements Exp {
     }
 
     @Override
+    public Type typeCheck(Dictionary<String, Type> typeEnv) throws InterpreterException {
+        Type type1 = left.typeCheck(typeEnv);
+        Type type2 = right.typeCheck(typeEnv);
+
+        if (!type1.equals(new IntType())) {
+            throw new InterpreterException("First operand is not an integer, got: " + type1);
+        }
+
+        if (!type2.equals(new IntType())) {
+            throw new InterpreterException("Second operand is not an integer, got: " + type2);
+        }
+
+        return new BoolType();
+    }
+
+    @Override
     public Value eval(Dictionary<String, Value> symTable, Heap heap) throws InterpreterException {
         Value v1 = left.eval(symTable, heap);
         if (!v1.getType().equals(new IntType())) {

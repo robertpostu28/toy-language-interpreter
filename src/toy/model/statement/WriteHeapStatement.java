@@ -19,6 +19,28 @@ public class WriteHeapStatement implements Statement {
     }
 
     @Override
+    public Dictionary<String, Type> typeCheck(Dictionary<String, Type> typeEnv) throws InterpreterException {
+        Type varType = typeEnv.lookup(varName);
+        Type exprType = expression.typeCheck(typeEnv);
+
+        if (!(varType instanceof RefType)) {
+            throw new InterpreterException(
+                    "wH: variable " + varName + " is not of RefType."
+            );
+        }
+
+        if (!((RefType) varType).getInner().equals(exprType)) {
+            throw new InterpreterException(
+                    "wH: type mismatch for variable " + varName +
+                            " (expected " + ((RefType) varType).getInner() +
+                            ", got " + exprType + ")."
+            );
+        }
+
+        return typeEnv;
+    }
+
+    @Override
     public PrgState execute(PrgState state) throws InterpreterException {
         Dictionary<String, Value> symTable = state.getSymTable();
         Heap heap = state.getHeap();

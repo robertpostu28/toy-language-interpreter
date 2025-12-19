@@ -6,6 +6,7 @@ import toy.model.type.BoolType;
 import toy.model.value.BoolValue;
 import toy.model.value.Value;
 import toy.model.adt.Heap;
+import toy.model.type.Type;
 
 public class LogicExp implements Exp {
     public enum Op { AND, OR }
@@ -26,6 +27,21 @@ public class LogicExp implements Exp {
             case "or", "||" -> new LogicExp(left, right, Op.OR);
             default -> throw new IllegalArgumentException("Unknown logical operator: " + opText);
         };
+    }
+
+    @Override
+    public Type typeCheck(Dictionary<String, Type> typeEnv) throws InterpreterException {
+        Type t1 = left.typeCheck(typeEnv);
+        Type t2 = right.typeCheck(typeEnv);
+
+        if (!t1.equals(new BoolType())) {
+            throw new InterpreterException("First operand is not a boolean! It is: " + t1);
+        }
+        if (!t2.equals(new BoolType())) {
+            throw new InterpreterException("Second operand is not a boolean! It is: " + t2);
+        }
+
+        return new BoolType();
     }
 
     @Override

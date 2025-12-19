@@ -2,11 +2,6 @@ package toy.model.statement;
 
 import toy.exceptions.InterpreterException;
 import toy.model.adt.Dictionary;
-import toy.model.statement.PrgState;
-import toy.model.type.BoolType;
-import toy.model.type.IntType;
-import toy.model.value.BoolValue;
-import toy.model.value.IntValue;
 import toy.model.value.Value;
 import toy.model.type.Type;
 
@@ -17,6 +12,15 @@ public class VariableDeclarationStatement implements Statement {
     public VariableDeclarationStatement(String varName, Type varType) {
         this.varName = varName;
         this.varType = varType;
+    }
+
+    @Override
+    public Dictionary<String, Type> typeCheck(Dictionary<String, Type> typeEnv) throws InterpreterException {
+        if (typeEnv.isDefined(varName)) {
+            throw new InterpreterException("Variable already defined in type environment: " + varName);
+        }
+        typeEnv.update(varName, varType);
+        return typeEnv;
     }
 
     @Override

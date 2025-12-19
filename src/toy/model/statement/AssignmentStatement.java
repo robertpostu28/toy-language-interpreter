@@ -16,6 +16,17 @@ public class AssignmentStatement implements Statement {
     }
 
     @Override
+    public Dictionary<String, Type> typeCheck(Dictionary<String, Type> typeEnv) throws InterpreterException {
+        Type typeVar = typeEnv.lookup(id);
+        Type typeExp = exp.typeCheck(typeEnv);
+
+        if (!typeVar.equals(typeExp)) {
+            throw new InterpreterException("Assignment: type mismatch for variable " + id + " (expected " + typeVar + ", got " + typeExp + ").");
+        }
+        return typeEnv;
+    }
+
+    @Override
     public PrgState execute(PrgState state) throws InterpreterException {
         Dictionary<String, Value> sym = state.getSymTable();
 

@@ -19,6 +19,22 @@ public class NewStatement implements Statement {
     }
 
     @Override
+    public Dictionary<String, Type> typeCheck(Dictionary<String, Type> typeEnv) throws InterpreterException {
+        Type varType = typeEnv.lookup(varName);
+        Type exprType = expression.typeCheck(typeEnv);
+
+        if (!(varType instanceof RefType)) {
+            throw new InterpreterException("NewStatement: variable " + varName + " is not of RefType.");
+        }
+
+        if (!((RefType) varType).getInner().equals(exprType)) {
+            throw new InterpreterException("NewStatement: type mismatch for variable " + varName + " (expected " + ((RefType) varType).getInner() + ", got " + exprType + ").");
+        }
+
+        return typeEnv;
+    }
+
+    @Override
     public PrgState execute(PrgState prgState) throws InterpreterException {
         Dictionary<String, Value>  symTable = prgState.getSymTable();
         Heap heap = prgState.getHeap();

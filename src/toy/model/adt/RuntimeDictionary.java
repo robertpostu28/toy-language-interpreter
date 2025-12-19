@@ -40,6 +40,15 @@ public class RuntimeDictionary<K, V> implements Dictionary<K, V> {
     }
 
     @Override
+    public Dictionary<K, V> deepCopy() {
+        Dictionary<K, V> copy = new RuntimeDictionary<>();
+        for (var entry : this.asMap().entrySet()) {
+            copy.update(entry.getKey(), entry.getValue());
+        }
+        return copy;
+    }
+
+    @Override
     public int size() {
         return map.size();
     }

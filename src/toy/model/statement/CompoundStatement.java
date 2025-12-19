@@ -1,6 +1,8 @@
 package toy.model.statement;
 
 import toy.exceptions.InterpreterException;
+import toy.model.type.Type;
+import toy.model.adt.Dictionary;
 import toy.model.statement.PrgState;
 
 public class CompoundStatement implements Statement {
@@ -18,6 +20,12 @@ public class CompoundStatement implements Statement {
         state.getExeStack().push(second);
         state.getExeStack().push(first);
         return null;
+    }
+
+    @Override
+    public Dictionary<String, Type> typeCheck(Dictionary<String, Type> typeEnv) throws InterpreterException {
+        Dictionary<String, Type> updatedEnv = first.typeCheck(typeEnv);
+        return second.typeCheck(updatedEnv);
     }
 
     @Override

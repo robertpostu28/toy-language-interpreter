@@ -19,6 +19,20 @@ public class IfStatement implements Statement {
     }
 
     @Override
+    public Dictionary<String, toy.model.type.Type> typeCheck(Dictionary<String, toy.model.type.Type> typeEnv) throws InterpreterException {
+        toy.model.type.Type condType = condition.typeCheck(typeEnv);
+
+        if (!condType.equals(new BoolType())) {
+            throw new InterpreterException("The condition of IF does not have the type Bool (found " + condType + ")");
+        }
+
+        thenStatement.typeCheck(typeEnv.deepCopy());
+        elseStatement.typeCheck(typeEnv.deepCopy());
+
+        return typeEnv;
+    }
+
+    @Override
     public PrgState execute(PrgState state) throws InterpreterException {
         Dictionary<String, Value> symTable = state.getSymTable();
         Value condValue = condition.eval(symTable, state.getHeap());

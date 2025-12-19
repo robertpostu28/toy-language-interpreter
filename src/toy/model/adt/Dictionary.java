@@ -11,6 +11,8 @@ public interface Dictionary<K, V> {
     void remove(K key) throws InterpreterException;
     int size();
 
+    Dictionary<K, V> deepCopy() throws InterpreterException;
+
     Map<K, V> asMap(); // for iterations / debugging
     String toString();
 }

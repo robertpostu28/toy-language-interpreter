@@ -16,6 +16,17 @@ public class ReadHeapExp implements Exp {
     }
 
     @Override
+    public Type typeCheck(Dictionary<String, Type> typeEnv) throws InterpreterException {
+        Type exprType = expression.typeCheck(typeEnv);
+
+        if (exprType instanceof RefType refType) {
+            return refType.getInner();
+        } else {
+            throw new InterpreterException("ReadHeapExp: expression " + expression + " not of RefType, got: " + exprType);
+        }
+    }
+
+    @Override
     public Value eval(Dictionary<String, Value> symTable, Heap heap) throws InterpreterException {
         Value value = expression.eval(symTable, heap);
 

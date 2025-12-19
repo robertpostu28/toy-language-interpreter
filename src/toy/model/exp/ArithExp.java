@@ -6,6 +6,7 @@ import toy.model.adt.Heap;
 import toy.model.value.Value;
 import toy.model.value.IntValue;
 import toy.model.type.IntType;
+import toy.model.type.Type;
 
 public class ArithExp implements Exp {
     private final Exp left;
@@ -16,6 +17,21 @@ public class ArithExp implements Exp {
         this.left = left;
         this.right = right;
         this.operation = operation;
+    }
+
+    @Override
+    public Type typeCheck(Dictionary<String, Type> typeEnv) throws InterpreterException {
+        Type type1 = left.typeCheck(typeEnv);
+        Type type2 = right.typeCheck(typeEnv);
+
+        if (!type1.equals(new IntType())) {
+            throw new InterpreterException("First operand is not an integer! It is: " + type1);
+        }
+        if (!type2.equals(new IntType())) {
+            throw new InterpreterException("Second operand is not an integer! It is: " + type2);
+        }
+
+        return new IntType();
     }
 
     @Override

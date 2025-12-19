@@ -5,6 +5,7 @@ import toy.model.adt.Dictionary;
 import toy.model.exp.Exp;
 import toy.model.type.IntType;
 import toy.model.type.StringType;
+import toy.model.type.Type;
 import toy.model.value.IntValue;
 import toy.model.value.StringValue;
 import toy.model.value.Value;
@@ -19,6 +20,21 @@ public class ReadFileStatement implements Statement {
     public ReadFileStatement(Exp expFile, String varName) {
         this.expFile = expFile;
         this.varName = varName;
+    }
+
+    @Override
+    public Dictionary<String, Type> typeCheck(Dictionary<String, Type> typeEnv) throws InterpreterException {
+        Type typeExp = expFile.typeCheck(typeEnv);
+        Type typeVar = typeEnv.lookup(varName);
+
+        if (!typeExp.equals(new StringType())) {
+            throw new InterpreterException("readFile: expression is not of type string.");
+        }
+        if (!typeVar.equals(new IntType())) {
+            throw new InterpreterException("readFile: variable " + varName + " is not of type int.");
+        }
+
+        return typeEnv;
     }
 
     @Override

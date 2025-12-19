@@ -6,6 +6,7 @@ import toy.model.adt.RuntimeStack;
 import toy.model.adt.Dictionary;
 import toy.model.adt.Stack;
 import toy.model.value.Value;
+import toy.model.type.Type;
 
 import java.util.function.BiConsumer;
 
@@ -14,6 +15,13 @@ public class ForkStatement implements Statement {
 
     public ForkStatement(Statement statement) {
         this.statement = statement;
+    }
+
+    @Override
+    public Dictionary<String, Type> typeCheck(Dictionary<String, Type> typeEnv) throws InterpreterException {
+        // fork creates a new thread with the same type environment
+        statement.typeCheck(typeEnv.deepCopy());
+        return typeEnv;
     }
 
     @Override

@@ -6,6 +6,7 @@ import toy.model.adt.Heap;
 import toy.model.adt.Stack;
 import toy.model.exp.Exp;
 import toy.model.type.BoolType;
+import toy.model.type.Type;
 import toy.model.value.BoolValue;
 import toy.model.value.Value;
 
@@ -16,6 +17,18 @@ public class WhileStatement implements Statement {
     public WhileStatement(Exp condition, Statement body) {
         this.condition = condition;
         this.body = body;
+    }
+
+    @Override
+    public Dictionary<String, toy.model.type.Type> typeCheck(Dictionary<String, toy.model.type.Type> typeEnv) throws InterpreterException {
+        Type conditionType = condition.typeCheck(typeEnv);
+
+        if (!conditionType.equals(new BoolType())) {
+            throw new InterpreterException("While: condition is not of type Bool (found " + conditionType + ").");
+        }
+
+        body.typeCheck(typeEnv.deepCopy());
+        return typeEnv;
     }
 
     @Override

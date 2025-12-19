@@ -454,6 +454,14 @@ public class ConsoleView implements View {
                         )
                 );
 
+        // NEG examples for error handling testing
+        // NEG Type Error: int v; v = true;
+        Statement negType =
+                new CompoundStatement(
+                        new VariableDeclarationStatement("v", new IntType()),
+                        new AssignmentStatement("v", new ValueExp(new BoolValue(true)))
+                );
+
 
 
         RunExample cmd1 = buildCommandForProgram(
@@ -575,6 +583,13 @@ public class ConsoleView implements View {
                 "log17_fork.txt"
         );
 
+        RunExample cmd18 = buildCommandForProgram(
+                "18",
+                "NEG Type Error: int v; v = true;",
+                negType,
+                "log18_negtype.txt"
+        );
+
 
         // ======================
         // 3. BUILD & RUN MENU
@@ -599,6 +614,7 @@ public class ConsoleView implements View {
         menu.addCommand(cmd15);
         menu.addCommand(cmd16);
         menu.addCommand(cmd17);
+        menu.addCommand(cmd18);
 
         menu.show();  // prints menu + executes selected command in a loop
     }

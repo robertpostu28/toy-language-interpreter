@@ -1,6 +1,7 @@
 package toy.view;
 
 import toy.controller.Controller;
+import toy.controller.InterpreterController;
 import toy.exceptions.InterpreterException;
 import toy.model.statement.PrgState;
 import toy.repository.Repository;
@@ -28,6 +29,7 @@ public class RunExample extends Command {
         }
 
         try {
+            controller.typeCheckAll();
             controller.allStep();
 
             if (initial != null) {
